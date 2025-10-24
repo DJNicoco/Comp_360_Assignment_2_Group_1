@@ -27,6 +27,13 @@ Players can drive the camera (or visible car) along the path, experience environ
 
 ---
 
+## Team Workflow
+
+Each member worked in their own godot software and sent the scripts and scenes to Nicole (Road Mesh & Collision Builder). She maintained the main repository and integrated all individual .tscn scenes and scripts into the main project.
+This ensured consistent folder structure and correct scene linking inside Main.tscn.
+
+---
+
 ## Core Features 
 - **Spline-based Road:** Hilbert-style space-filling curve segment hovering above terrain.  
 - **Camera Driving:** Smooth acceleration and look-ahead motion with easing functions.  
@@ -34,3 +41,4 @@ Players can drive the camera (or visible car) along the path, experience environ
 - **Gates & Timer Bonus:** Adds extra time on trigger.  
 - **Weather System:** Rain, dust, and smoke simulated with particle effects.
 - **HUD:** Displays timer, speed, and lap count
+
