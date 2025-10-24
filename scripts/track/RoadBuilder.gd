@@ -87,19 +87,16 @@ func rebuild() -> void:
 	var p := _get_path3d()
 	if p == null:
 		push_error("RoadBuilder: No Path3D found. (Assign 'path' or add a sibling named 'Track')")
-		_spawn_debug_marker(Vector3.ZERO)
 		return
 
 	var curve := p.curve
 	if curve == null or curve.get_point_count() < 2:
 		push_error("RoadBuilder: Path3D curve needs at least 2 points.")
-		_spawn_debug_marker(p.global_position)
 		return
 
 	var mesh := _build_mesh(curve)
 	if mesh.get_surface_count() == 0:
 		push_error("RoadBuilder: Mesh generation failed (check curve spacing/step).")
-		_spawn_debug_marker(curve.sample_baked(0.0))
 		return
 
 	_mount_mesh(mesh)
@@ -207,9 +204,9 @@ func _mount_mesh(m: ArrayMesh) -> void:
 	_mesh_instance.mesh = m
 
 	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = load("res://Road..png")  # make sure this path matches your texture
+	mat.albedo_texture = load("res://textures/Road.png")  # make sure this path matches your texture
 	mat.albedo_color = Color(1.4, 1.4, 1.4)
-	mat.uv1_scale = Vector3(1, 8, 1)  
+	mat.uv1_scale = Vector3(1, 3, 1)  
 	mat.roughness = 1.0
 	mat.metallic = 0.0
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
@@ -232,11 +229,3 @@ func _make_collision(m: ArrayMesh) -> void:
 	var shape := ConcavePolygonShape3D.new()
 	shape.set_faces(faces)
 	_collision_shape.shape = shape
-
-# ---------- Debug helper ----------
-func _spawn_debug_marker(pos: Vector3) -> void:
-	var marker := MeshInstance3D.new()
-	marker.mesh = BoxMesh.new()
-	marker.name = "DebugMarker"
-	add_child(marker)
-	marker.global_position = pos + Vector3(0, 0.5, 0)
