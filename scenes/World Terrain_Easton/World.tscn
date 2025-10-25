@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://cj754hgjlgfi1"]
+
+[ext_resource type="PackedScene" path="res://scenes/terrain/3dLandscape.tscn" id="1_7g83o"]
+[ext_resource type="PackedScene" uid="uid://cjvlghvjqi3xu" path="res://3DRoad.tscn" id="2_d1c63"]
+[ext_resource type="Script" uid="uid://dl83s15x22yuf" path="res://scenes/camera_rig.gd" id="3_1lgw5"]
+
+[sub_resource type="Curve3D" id="Curve3D_hlk0d"]
+closed = true
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.9724603, 0.006210327, -15.916198, 0, 0, 0, 0, 0, 0, -6.781604, -0.004119873, -14.89269, 0, 0, 0, 0, 0, 0, -11.118231, -0.010299683, -6.2952356, 0, 0, 0, 0, 0, 0, -7.956776, -0.0093688965, 5.830755, 0, 0, 0, 0, 0, 0, 1.7586432, 0.000289917, 8.197735, 0, 0, 0, 0, 0, 0, 6.9307775, 0.0066986084, 2.961607, 0, 0, 0, 0, 0, 0, 7.6316767, 0.009170532, -5.898978),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 8
+
+[node name="World" type="Node3D"]
+
+[node name="Terrain" parent="." instance=ExtResource("1_7g83o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2564716, 3.594799, -4.398855)
+
+[node name="3dRoad" parent="." instance=ExtResource("2_d1c63")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 25, 0)
+
+[node name="TrackPath" type="Path3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 104, 5)
+curve = SubResource("Curve3D_hlk0d")
+
+[node name="CameraRig" type="PathFollow3D" parent="TrackPath"]
+transform = Transform3D(0.9830019, -7.0414455e-05, -0.18358254, 1.0913912e-11, 0.9999975, -0.00038355697, 0.18358245, 0.00037703788, 0.9830024, 0, 0, 0)
+script = ExtResource("3_1lgw5")
+
+[node name="Camera3D" type="Camera3D" parent="TrackPath/CameraRig"]
+transform = Transform3D(1.0000019, 0, 0, 0, 1.0000014, 0, 0, 0, 1.0000015, 0, 5, -25)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.70710677, -0.49999997, 0.49999997, 0, 0.70710677, 0.70710677, -0.70710677, -0.49999997, 0.49999997, 0, 60, 0)
+shadow_enabled = true
