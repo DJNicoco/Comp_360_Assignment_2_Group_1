@@ -1,0 +1,98 @@
+[gd_scene load_steps=10 format=3 uid="uid://8cekn4ao3gts"]
+
+[ext_resource type="Script" uid="uid://x7bhk6e3g7qg" path="res://scripts/HUD_Bao/GameFlow.gd" id="1_q8u5g"]
+[ext_resource type="Script" uid="uid://crwwhmegsi3pq" path="res://scripts/camera_3d.gd" id="2_cm0pq"]
+[ext_resource type="Script" uid="uid://qivrhn6wtx1e" path="res://scripts/Road Mesh + Collision Builder_Nicole/RoadBuilder.gd" id="2_rvslj"]
+[ext_resource type="PackedScene" uid="uid://dum7dtva016nl" path="res://scenes/Test3DRoad.tscn" id="3_fos0i"]
+[ext_resource type="PackedScene" uid="uid://dsvt432s18267" path="res://scenes/World Terrain_Easton/3dLandscape.tscn" id="4_rarhs"]
+[ext_resource type="PackedScene" uid="uid://bi8q7d26kqh27" path="res://scenes/Weather Feature_Jasmine/weather_controller.tscn" id="5_vcsgt"]
+[ext_resource type="PackedScene" uid="uid://c7nhkkx242mer" path="res://scenes/HUD_Bao/hud.tscn" id="6_c01mt"]
+[ext_resource type="PackedScene" uid="uid://d2hyvyeuredv0" path="res://scenes/HUD_Bao/StartTrigger.tscn" id="8_lhr70"]
+[ext_resource type="PackedScene" uid="uid://d4h734u71081" path="res://scenes/HUD_Bao/FinishTrigger.tscn" id="9_wp0k4"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_q8u5g")
+
+[node name="Camera3D" type="Camera3D" parent="." node_paths=PackedStringArray("track")]
+transform = Transform3D(1, 0, 0, 0, 0.9396926, -0.34202012, 0, 0.34202012, 0.9396926, 0, 150, 0)
+visible = false
+keep_aspect = 0
+current = true
+fov = 147.8
+script = ExtResource("2_cm0pq")
+track = NodePath("../TrackRoot/Track")
+
+[node name="TrackRoot" parent="." instance=ExtResource("3_fos0i")]
+visible = false
+
+[node name="Track" parent="TrackRoot" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.474228, -58.292694, 3.0396118)
+
+[node name="Road" type="Node3D" parent="."]
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 0.2, -16.735748)
+script = ExtResource("2_rvslj")
+path = NodePath("../TrackRoot/Track")
+half_width = 4.0
+uv_repeat_meters = 2.0
+
+[node name="Terrain" parent="Road" instance=ExtResource("4_rarhs")]
+transform = Transform3D(0.29999998, 0, 0, 0, 0.29999998, 0, 0, 0, 0.29999998, 0, -20.999998, 2.2189999)
+
+[node name="Camera3D" parent="Road/Terrain" index="1"]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.81915206, -0.4055798, 0.4055798, 0, 0.70710677, 0.70710677, -0.57357645, -0.579228, 0.579228, 0, 0, 0)
+light_energy = 2.5
+shadow_enabled = true
+
+[node name="WeatherController" parent="." instance=ExtResource("5_vcsgt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 0)
+
+[node name="HUD" parent="." instance=ExtResource("6_c01mt")]
+
+[node name="MarginContainer" parent="HUD" index="0"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_right = 0.0
+offset_bottom = 93.0
+grow_horizontal = 0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" parent="HUD/MarginContainer" index="0"]
+alignment = 2
+
+[node name="CenterContainer" parent="HUD" index="1"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = -23.0
+offset_right = 1.0
+offset_bottom = 0.0
+grow_vertical = 0
+
+[node name="StartTrigger" parent="." instance=ExtResource("8_lhr70")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 0, 237)
+
+[node name="FinishTrigger" parent="." instance=ExtResource("9_wp0k4")]
+
+[node name="GameFlow" type="Node" parent="."]
+script = ExtResource("1_q8u5g")
+start_trigger_path = NodePath("../StartTrigger")
+finish_trigger_path = NodePath("../FinishTrigger")
+
+[connection signal="body_entered" from="StartTrigger" to="GameFlow" method="_on_start_trigger_entered"]
+[connection signal="body_entered" from="FinishTrigger" to="." method="_on_finish_trigger_entered"]
+
+[editable path="TrackRoot"]
+[editable path="Road/Terrain"]
+[editable path="WeatherController"]
+[editable path="HUD"]
+[editable path="StartTrigger"]
+[editable path="FinishTrigger"]

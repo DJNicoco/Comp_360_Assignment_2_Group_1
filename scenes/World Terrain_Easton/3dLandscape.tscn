@@ -1,6 +1,4 @@
-[gd_scene load_steps=3 format=4 uid="uid://dsvt432s18267"]
-
-[ext_resource type="Script" uid="uid://bxd7lk8ir3g0x" path="res://Scripts/3D/mesh_instance_3d.gd" id="1_4u8wn"]
+[gd_scene load_steps=2 format=4 uid="uid://dsvt432s18267"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_a202f"]
 _surfaces = [{
@@ -18,8 +16,6 @@ _surfaces = [{
 [node name="Node3D" type="Node3D"]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.671262, -0.0102179, 0.74115, -0.0517735, 0.998109, -0.0331309, -0.73941, -0.0606114, -0.670522, -17.9588, -7.77639, 14.6519)
 mesh = SubResource("ArrayMesh_a202f")
-script = ExtResource("1_4u8wn")
 
 [node name="Camera3D" type="Camera3D" parent="."]

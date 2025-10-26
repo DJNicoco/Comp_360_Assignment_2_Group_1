@@ -62,6 +62,7 @@ func get_current_lap() -> int:
 func update_timer(time: float):
 	if not timer_label:
 		return
+	@warning_ignore("integer_division")
 	var minutes = int(time) / 60
 	var seconds = fmod(time, 60.0)
 	timer_label.text = "Time: %02d:%05.2f" % [minutes, seconds]
@@ -88,6 +89,7 @@ func show_message(text: String, duration: float = 0.0):
 			message_label.text = ""
 
 func get_final_time() -> String:
+	@warning_ignore("integer_division")
 	var minutes = int(race_time) / 60
 	var seconds = fmod(race_time, 60.0)
 	return "%02d:%05.2f" % [minutes, seconds]
