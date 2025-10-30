@@ -1,0 +1,131 @@
+[gd_scene load_steps=10 format=3 uid="uid://dhxnawskmimit"]
+
+[ext_resource type="Script" uid="uid://xqx2l30cy7ux" path="res://car.gd" id="14_70uel"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_dwbse"]
+
+[sub_resource type="Sky" id="Sky_pkg7o"]
+sky_material = SubResource("ProceduralSkyMaterial_dwbse")
+
+[sub_resource type="Environment" id="Environment_gbfbk"]
+background_mode = 2
+sky = SubResource("Sky_pkg7o")
+tonemap_mode = 3
+
+[sub_resource type="Curve3D" id="Curve3D_70uel"]
+closed = true
+_data = {
+"points": PackedVector3Array(-44.4949, -4.13073, 53.4583, 44.4949, 4.13073, -53.4583, 146.623, 43.8057, 40.0444, -20.6094, 17.8437, -24.1521, 20.6094, -17.8437, 24.1521, 247.428, 37.8105, 67.4952, -20.788, 9.71904, -9.20499, 20.788, -9.71904, 9.20499, 331.339, 37.0577, 142.152, 18.7648, 12.1153, -44.375, -18.7648, -12.1153, 44.375, 453.917, 45.9803, 271.203, 29.9674, -2.42411, -45.225, -29.9674, 2.42411, 45.225, 429.259, 28.2911, 357.015, 19.4126, -14.6704, 41.3255, -19.4126, 14.6704, -41.3255, 311.336, 18.7295, 394.702, 1.32556, -19.8567, 53.3813, -1.32556, 19.8567, -53.3813, 237.543, 37.2106, 307.75, -25.5621, -17.639, 54.6975, 25.5621, 17.639, -54.6975, 91.7099, 49.8996, 149.068),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_70uel"]
+size = Vector3(1.5, 0.5, 3)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_hiqwa"]
+points = PackedVector3Array(-0.77381, 0.297507, -1.52351, 0.73229, -0.25, 1.39684, -0.77381, 0.297507, 1.52351, 0.797465, 0.297619, -1.52351, -0.708481, -0.25, -1.39684, 0.73229, -0.25, -1.39684, -0.708481, -0.25, 1.39684, 0.797465, 0.297619, 1.52351)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nnsk1"]
+albedo_color = Color(0.43137255, 0.43137255, 0.43137255, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_udxuc"]
+material = SubResource("StandardMaterial3D_nnsk1")
+top_radius = 0.4
+bottom_radius = 0.4
+height = 0.25
+radial_segments = 12
+
+[node name="World" type="Node3D"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.887156, 0.46147, 0, -0.46147, 0.887156, 0, 0, 0.00191402)
+light_color = Color(0.921569, 0.85098, 0.623529, 1)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_gbfbk")
+
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="Path3D" type="Path3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.988956, 2.72508, -2.04417)
+curve = SubResource("Curve3D_70uel")
+
+[node name="Track" type="CSGPolygon3D" parent="Node3D"]
+transform = Transform3D(0.99963, 0.000726581, -0.0271887, 0.00059671, 0.998817, 0.048631, 0.0271917, -0.0486293, 0.998446, 8.98016, -2.99179, -2.10587)
+use_collision = true
+polygon = PackedVector2Array(19.7752, -8.52187, 3.59895, -8.51932, 5.76044, -5.75055, 20.4634, -5.48058)
+mode = 2
+path_node = NodePath("../Path3D")
+path_interval_type = 0
+path_interval = 0.1
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = false
+path_local = false
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = true
+
+[node name="Car" type="VehicleBody3D" parent="Node3D"]
+transform = Transform3D(0.867001, 0, 0.498306, 0, 1, 0, -0.498306, 0, 0.867001, 121.478, 60.2235, 114.503)
+mass = 80.0
+script = ExtResource("14_70uel")
+
+[node name="car_body" type="MeshInstance3D" parent="Node3D/Car"]
+mesh = SubResource("BoxMesh_70uel")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/Car"]
+shape = SubResource("ConvexPolygonShape3D_hiqwa")
+
+[node name="front_left_wheel" type="VehicleWheel3D" parent="Node3D/Car"]
+transform = Transform3D(1.000001, 0, 0, 0, 1.0000005, 0, 0, 0, 1.0000011, -0.806534, -0.0240974, -0.605865)
+use_as_steering = true
+wheel_radius = 0.4
+suspension_stiffness = 50.0
+damping_compression = 1.9
+damping_relaxation = 2.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/Car/front_left_wheel"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_udxuc")
+
+[node name="front_right_wheel" type="VehicleWheel3D" parent="Node3D/Car"]
+transform = Transform3D(-0.995519, 0.0927593, 0.0184254, 0.0945587, 0.973197, 0.209635, 0.00151527, 0.210438, -0.977607, 0.823189, -0.194771, -0.731155)
+use_as_steering = true
+wheel_radius = 0.4
+suspension_stiffness = 50.0
+damping_compression = 1.9
+damping_relaxation = 2.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/Car/front_right_wheel"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_udxuc")
+
+[node name="back_left_wheel" type="VehicleWheel3D" parent="Node3D/Car"]
+transform = Transform3D(-0.999066, -0.0431882, -0.00151601, -0.0430093, 0.990277, 0.132294, -0.0042122, 0.132235, -0.99121, -0.83757, -0.19146, 0.824326)
+use_as_traction = true
+wheel_radius = 0.4
+suspension_stiffness = 50.0
+damping_compression = 1.9
+damping_relaxation = 2.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/Car/back_left_wheel"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_udxuc")
+
+[node name="back_right_wheel" type="VehicleWheel3D" parent="Node3D/Car"]
+transform = Transform3D(-0.996651, 0.00319736, 0.0817253, 0.0127759, 0.993055, 0.116964, -0.080783, 0.117616, -0.989768, 0.850353, -0.245941, 0.809647)
+use_as_traction = true
+wheel_radius = 0.4
+suspension_stiffness = 50.0
+damping_compression = 1.9
+damping_relaxation = 2.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/Car/back_right_wheel"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_udxuc")
+
+[node name="Camera3D" type="Camera3D" parent="Node3D/Car"]
+transform = Transform3D(0.99484456, 0.10101606, 0.00897038, -0.10101605, 0.9792369, 0.17575794, 0.008970261, -0.17575797, 0.98439276, -2.081749, 1.454689, 6.4908295)
+fov = 95.625

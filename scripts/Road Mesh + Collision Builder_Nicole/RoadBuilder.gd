@@ -256,13 +256,14 @@ func _make_collision(m: ArrayMesh) -> void:
 
 	var shape := ConcavePolygonShape3D.new()
 	shape.set_faces(faces)
+	print("ROAD collider faces=", faces.size(), " layer=", _static_body.collision_layer, " mask=", _static_body.collision_mask)
 
 	_collision_shape.disabled = false
 	_collision_shape.shape = shape
 
 	# Put the StaticBody exactly where the visible mesh is
 	_static_body.top_level = true
-	_static_body.global_transform = global_transform
+	_static_body.global_transform = _mesh_instance.global_transform
 
 	# **Force** a known layer/mask = 1 for the road
 	_static_body.collision_layer = 0

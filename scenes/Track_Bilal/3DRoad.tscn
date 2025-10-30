@@ -1,4 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://dum7dtva016nl"]
+[gd_scene load_steps=5 format=3 uid="uid://dum7dtva016nl"]
+
+[ext_resource type="Texture2D" uid="uid://bhdune3flsssa" path="res://textures/Road.png" id="1_8fj77"]
+[ext_resource type="PackedScene" uid="uid://cpn5oi7negqtt" path="res://scenes/Road_Nicole/MainRoadBuilder.tscn" id="2_ymgcc"]
 
 [sub_resource type="Curve3D" id="Curve3D_4njg1"]
 closed = true
@@ -9,18 +12,19 @@ _data = {
 point_count = 14
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6gvxq"]
+albedo_texture = ExtResource("1_8fj77")
 
-[node name="Node3D" type="Node3D"]
+[node name="Track" type="Node3D"]
 
 [node name="Track" type="Path3D" parent="."]
 transform = Transform3D(20, 0, 0, 0, 4, 0, 0, 0, 20, 0, 0, 0)
 curve = SubResource("Curve3D_4njg1")
 
-[node name="CSGPolygon3D" type="CSGPolygon3D" parent="Track"]
-visible = false
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
+transform = Transform3D(20, 0, 0, 0, 4, 0, 0, 0, 20, 0, -459.3265, 0)
 polygon = PackedVector2Array(-2.25, 0, -0.019714355, 0.0521698, 0.95410156, 0.04676819, 1, 0)
 mode = 2
-path_node = NodePath("..")
+path_node = NodePath("../Track")
 path_interval_type = 0
 path_interval = 1.0
 path_simplify_angle = 0.0
@@ -31,3 +35,7 @@ path_continuous_u = false
 path_u_distance = 0.0
 path_joined = false
 material = SubResource("StandardMaterial3D_6gvxq")
+
+[node name="RoadBuilder" parent="." instance=ExtResource("2_ymgcc")]
+
+[editable path="RoadBuilder"]
