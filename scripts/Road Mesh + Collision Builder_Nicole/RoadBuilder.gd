@@ -11,11 +11,16 @@ class_name RoadBuilder
 @export var hard_normals_up: bool = true : set = _set_hard_normals_up
 @export var auto_rebuild: bool = true : set = _set_auto_rebuild
 
+@export_flags_3d_physics var road_layer := 1
+@export_flags_3d_physics var road_mask := 1
+
 # ---------- One-click action in Inspector ----------
 @export_category("Actions")
 @export var Rebuild: bool:
 	set(v):
-		if v: rebuild()
+		if v:
+			rebuild()
+			set_deferred("Rebuild", false)
 
 # ---------- Cached children ----------
 var _mesh_instance: MeshInstance3D
@@ -30,7 +35,6 @@ func _ready() -> void:
 	else:
 		rebuild()
 
-# (Removed NOTIFICATION_EDITOR_PROPERTY_CHANGED; we rebuild via setters + button)
 func _notification(what):
 	if not Engine.is_editor_hint():
 		return
@@ -60,7 +64,14 @@ func _set_hard_normals_up(v: bool) -> void:
 
 func _set_auto_rebuild(v: bool) -> void:
 	auto_rebuild = v
-	# no rebuild here—user may toggle it off
+
+func _own(n: Node) -> void:
+	if not Engine.is_editor_hint():
+		return
+	var root := get_tree().edited_scene_root
+	if root == null:
+		root = self
+	n.owner = root
 
 # ---------- Ensure child nodes exist ----------
 func _ensure_children() -> void:
@@ -69,21 +80,38 @@ func _ensure_children() -> void:
 		_mesh_instance = MeshInstance3D.new()
 		_mesh_instance.name = "Mesh"
 		add_child(_mesh_instance)
+		_own(_mesh_instance)
 
 	_static_body = get_node_or_null("StaticBody3D") as StaticBody3D
 	if _static_body == null:
 		_static_body = StaticBody3D.new()
 		_static_body.name = "StaticBody3D"
 		add_child(_static_body)
+		_own(_static_body)
 
 	_collision_shape = _static_body.get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if _collision_shape == null:
 		_collision_shape = CollisionShape3D.new()
 		_collision_shape.name = "CollisionShape3D"
 		_static_body.add_child(_collision_shape)
+		_own(_collision_shape)
+
+	_static_body.collision_layer = road_layer
+	_static_body.collision_mask  = road_mask
+
+	if Engine.is_editor_hint():
+		var names := PackedStringArray()
+		for c in get_children():
+			names.push_back(c.name)
+		push_warning("RB ensure: children=%d [%s]" % [get_child_count(), ",".join(names)])
+		if _mesh_instance:       push_warning("  Mesh owner: %s" % [str(_mesh_instance.owner)])
+		if _static_body:         push_warning("  StaticBody3D owner: %s" % [str(_static_body.owner)])
+		if _collision_shape:     push_warning("  CollisionShape3D owner: %s" % [str(_collision_shape.owner)])
 
 # ---------- Public build ----------
 func rebuild() -> void:
+	_ensure_children()
+	
 	var p := _get_path3d()
 	if p == null:
 		push_error("RoadBuilder: No Path3D found. (Assign 'path' or add a sibling named 'Track')")
@@ -101,6 +129,8 @@ func rebuild() -> void:
 
 	_mount_mesh(mesh)
 	_make_collision(mesh)
+	
+	push_warning("RoadBuilder: Rebuilt mesh + collision.")
 
 # ---------- Find Path3D ----------
 func _get_path3d() -> Path3D:
@@ -134,7 +164,6 @@ func _build_mesh(curve: Curve3D) -> ArrayMesh:
 	var inds  := PackedInt32Array()
 
 	if length <= 0.05:
-		# Fallback: obvious plank so something shows up
 		verts = PackedVector3Array([Vector3(-2,0,0), Vector3(2,0,0), Vector3(-2,0,10), Vector3(2,0,10)])
 		uvs   = PackedVector2Array([Vector2(0,0), Vector2(1,0), Vector2(0,1), Vector2(1,1)])
 		inds  = PackedInt32Array([0,1,3, 0,3,2])
@@ -148,7 +177,7 @@ func _build_mesh(curve: Curve3D) -> ArrayMesh:
 		while dist <= length + 0.001:
 			var pt: Vector3 = curve.sample_baked(dist)
 
-			var next_dist: float = dist + max(step, 0.1)   # <-- typed
+			var next_dist: float = dist + max(step, 0.1)
 			if next_dist > length:
 				next_dist = 0.0 if is_closed else length
 
@@ -165,22 +194,19 @@ func _build_mesh(curve: Curve3D) -> ArrayMesh:
 			verts.push_back(left_pt)
 			verts.push_back(right_pt)
 
-			var vcoord: float = dist / max(uv_repeat_meters, 0.001)   # <-- typed
-			uvs.push_back(Vector2(vcoord, 0.0)) # left
-			uvs.push_back(Vector2(vcoord, 1.0)) # right
+			var vcoord: float = dist / max(uv_repeat_meters, 0.001)
+			uvs.push_back(Vector2(vcoord, 0.0))
+			uvs.push_back(Vector2(vcoord, 1.0))
 
 			if v_i >= 2:
-				# (prevL, prevR, currR) + (prevL, currR, currL)
 				inds.append_array([v_i - 2, v_i - 1, v_i + 1,  v_i - 2, v_i + 1, v_i])
 
 			v_i += 2
 			dist += step
 
-		# If closed, stitch last segment back to first
 		if is_closed and v_i >= 4:
 			inds.append_array([v_i - 2, v_i - 1, 1,  v_i - 2, 1, 0])
 
-	# Optional normals (simple up normals for flat shading)
 	var normals := PackedVector3Array()
 	normals.resize(verts.size())
 	for j in range(normals.size()):
@@ -199,33 +225,52 @@ func _build_mesh(curve: Curve3D) -> ArrayMesh:
 
 	return mesh
 
-# ---------- Mount mesh + simple material ----------
+# ---------- Mount mesh + material ----------
 func _mount_mesh(m: ArrayMesh) -> void:
 	_mesh_instance.mesh = m
 
 	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = load("res://textures/Road.png")  # make sure this path matches your texture
+	mat.albedo_texture = load("res://textures/Road.png")
 	mat.albedo_color = Color(1.4, 1.4, 1.4)
-	mat.uv1_scale = Vector3(1, 3, 1)  
+	mat.uv1_scale = Vector3(1, 3, 1)
 	mat.roughness = 1.0
 	mat.metallic = 0.0
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_mesh_instance.set_surface_override_material(0, mat)
 
-# ---------- Build collision (fixed loop) ----------
+# ---------- Build collision ----------
 func _make_collision(m: ArrayMesh) -> void:
 	if m.get_surface_count() == 0:
 		return
+
+	# Build faces in local space
 	var arrays := m.surface_get_arrays(0)
 	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
-	var inds: PackedInt32Array    = arrays[Mesh.ARRAY_INDEX]
+	var inds:  PackedInt32Array    = arrays[Mesh.ARRAY_INDEX]
 
 	var faces := PackedVector3Array()
 	faces.resize(inds.size())
-	for i in range(inds.size()):            # fixed: use range()
+	for i in range(inds.size()):
 		faces[i] = verts[inds[i]]
 
 	var shape := ConcavePolygonShape3D.new()
 	shape.set_faces(faces)
+
+	_collision_shape.disabled = false
 	_collision_shape.shape = shape
+
+	# Put the StaticBody exactly where the visible mesh is
+	_static_body.top_level = true
+	_static_body.global_transform = global_transform
+
+	# **Force** a known layer/mask = 1 for the road
+	_static_body.collision_layer = 0
+	_static_body.collision_mask  = 0
+	_static_body.set_collision_layer_value(1, true)
+	_static_body.set_collision_mask_value(1, true)
+
+	# Debug: prove the collider is alive & on layer 1
+	print("ROAD collider faces=", faces.size(),
+		  " layer=", _static_body.collision_layer,
+		  " mask=", _static_body.collision_mask)

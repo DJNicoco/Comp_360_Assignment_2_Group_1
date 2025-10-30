@@ -26,11 +26,9 @@ func _ready():
 		vehicle = get_node(vehicle_path)
 	if start_trigger_path:
 		start_trigger = get_node(start_trigger_path)
-		start_trigger.body_entered.connect(_on_start_trigger_entered)
 	if finish_trigger_path:
 		finish_trigger = get_node(finish_trigger_path)
-		finish_trigger.body_entered.connect(_on_finish_trigger_entered)
-	
+		
 	# Find HUD - try multiple paths
 	hud = get_node_or_null("../HUD")
 	if not hud:

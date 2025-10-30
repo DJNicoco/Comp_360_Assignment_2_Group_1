@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpn5oi7negqtt"]
+
+[ext_resource type="Script" uid="uid://qivrhn6wtx1e" path="res://scripts/Road Mesh + Collision Builder_Nicole/RoadBuilder.gd" id="1_ebh0e"]
+
+[node name="RoadBuilder" type="Node3D"]
+transform = Transform3D(20, 0, 0, 0, 4, 0, 0, 0, 20, 0, 0, 0)
+script = ExtResource("1_ebh0e")
+path = NodePath("../TrackRoot/Track")
+half_width = 4.0
+uv_repeat_meters = 2.0

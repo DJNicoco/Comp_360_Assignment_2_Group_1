@@ -1,55 +1,56 @@
-[gd_scene load_steps=10 format=3 uid="uid://8cekn4ao3gts"]
+[gd_scene load_steps=11 format=3 uid="uid://8cekn4ao3gts"]
 
 [ext_resource type="Script" uid="uid://x7bhk6e3g7qg" path="res://scripts/HUD_Bao/GameFlow.gd" id="1_q8u5g"]
-[ext_resource type="Script" uid="uid://crwwhmegsi3pq" path="res://scripts/camera_3d.gd" id="2_cm0pq"]
-[ext_resource type="Script" uid="uid://qivrhn6wtx1e" path="res://scripts/Road Mesh + Collision Builder_Nicole/RoadBuilder.gd" id="2_rvslj"]
-[ext_resource type="PackedScene" uid="uid://dum7dtva016nl" path="res://scenes/Test3DRoad.tscn" id="3_fos0i"]
+[ext_resource type="Script" uid="uid://crwwhmegsi3pq" path="res://scripts/Road Mesh + Collision Builder_Nicole/camera_3d.gd" id="2_cm0pq"]
+[ext_resource type="PackedScene" uid="uid://dum7dtva016nl" path="res://scenes/Track_Bilal/3DRoad.tscn" id="3_fos0i"]
+[ext_resource type="PackedScene" uid="uid://cpn5oi7negqtt" path="res://scenes/Road_Nicole/MainRoadBuilder.tscn" id="4_lhr70"]
 [ext_resource type="PackedScene" uid="uid://dsvt432s18267" path="res://scenes/World Terrain_Easton/3dLandscape.tscn" id="4_rarhs"]
 [ext_resource type="PackedScene" uid="uid://bi8q7d26kqh27" path="res://scenes/Weather Feature_Jasmine/weather_controller.tscn" id="5_vcsgt"]
 [ext_resource type="PackedScene" uid="uid://c7nhkkx242mer" path="res://scenes/HUD_Bao/hud.tscn" id="6_c01mt"]
 [ext_resource type="PackedScene" uid="uid://d2hyvyeuredv0" path="res://scenes/HUD_Bao/StartTrigger.tscn" id="8_lhr70"]
 [ext_resource type="PackedScene" uid="uid://d4h734u71081" path="res://scenes/HUD_Bao/FinishTrigger.tscn" id="9_wp0k4"]
+[ext_resource type="PackedScene" uid="uid://mgp02mkor0at" path="res://scenes/AI Car & Ramps Feature/Car.tscn" id="10_lhr70"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_q8u5g")
+vehicle_path = NodePath("Car")
+start_trigger_path = NodePath("StartTrigger")
+finish_trigger_path = NodePath("FinishTrigger")
 
-[node name="Camera3D" type="Camera3D" parent="." node_paths=PackedStringArray("track")]
-transform = Transform3D(1, 0, 0, 0, 0.9396926, -0.34202012, 0, 0.34202012, 0.9396926, 0, 150, 0)
-visible = false
-keep_aspect = 0
+[node name="MainCamera" type="Camera3D" parent="." node_paths=PackedStringArray("track")]
+transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 161, 18, 247)
 current = true
-fov = 147.8
+fov = 141.5
+near = 0.3
 script = ExtResource("2_cm0pq")
 track = NodePath("../TrackRoot/Track")
+top_height = 300.0
 
 [node name="TrackRoot" parent="." instance=ExtResource("3_fos0i")]
-visible = false
+transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 0, 0)
 
 [node name="Track" parent="TrackRoot" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.474228, -58.292694, 3.0396118)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+visible = false
 
-[node name="Road" type="Node3D" parent="."]
-transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 0.2, -16.735748)
-script = ExtResource("2_rvslj")
-path = NodePath("../TrackRoot/Track")
-half_width = 4.0
-uv_repeat_meters = 2.0
+[node name="CSGPolygon3D" parent="TrackRoot/Track" index="0"]
+use_collision = true
 
-[node name="Terrain" parent="Road" instance=ExtResource("4_rarhs")]
-transform = Transform3D(0.29999998, 0, 0, 0, 0.29999998, 0, 0, 0, 0.29999998, 0, -20.999998, 2.2189999)
+[node name="RoadBuilder" parent="TrackRoot" instance=ExtResource("4_lhr70")]
+transform = Transform3D(13.333334, 0, 0, 0, 4, 0, 0, 0, 13.333334, 0, 0, 0)
+path = NodePath("../Track")
 
-[node name="Camera3D" parent="Road/Terrain" index="1"]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+[node name="StaticBody3D" type="StaticBody3D" parent="TrackRoot/RoadBuilder"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TrackRoot/RoadBuilder/StaticBody3D"]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.81915206, -0.4055798, 0.4055798, 0, 0.70710677, 0.70710677, -0.57357645, -0.579228, 0.579228, 0, 0, 0)
 light_energy = 2.5
 shadow_enabled = true
 
-[node name="WeatherController" parent="." instance=ExtResource("5_vcsgt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 0)
-
 [node name="HUD" parent="." instance=ExtResource("6_c01mt")]
+weather_controller_path = NodePath("../WeatherController")
 
 [node name="MarginContainer" parent="HUD" index="0"]
 anchors_preset = 1
@@ -78,21 +79,87 @@ offset_bottom = 0.0
 grow_vertical = 0
 
 [node name="StartTrigger" parent="." instance=ExtResource("8_lhr70")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 0, 237)
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 76, 30, 231)
+visible = false
 
 [node name="FinishTrigger" parent="." instance=ExtResource("9_wp0k4")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, -220, 34, 70)
+visible = false
+
+[node name="CollisionShape3D" parent="FinishTrigger" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.122281075, 0, 1.8944149)
 
 [node name="GameFlow" type="Node" parent="."]
 script = ExtResource("1_q8u5g")
 start_trigger_path = NodePath("../StartTrigger")
 finish_trigger_path = NodePath("../FinishTrigger")
 
+[node name="Terrain" parent="." instance=ExtResource("4_rarhs")]
+transform = Transform3D(4.4999995, 0, 0, 0, 4.4999995, 0, 0, 0, 4.4999995, 0, -314.79996, 16.549248)
+visible = false
+
+[node name="Camera3D" parent="Terrain" index="1"]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="WeatherController" parent="." instance=ExtResource("5_vcsgt")]
+
+[node name="Rain" parent="WeatherController" index="0"]
+visibility_aabb = AABB(-200, 0, -200, 400, 200, 400)
+
+[node name="Snow" parent="WeatherController" index="1"]
+visible = false
+
+[node name="Car" parent="." instance=ExtResource("10_lhr70")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.711, 18, -2.441)
+
+[node name="VehicleBody3D" parent="Car" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 167.11868, 0.79999995, 251.99998)
+
+[node name="Rear_Left" parent="Car/VehicleBody3D" index="2"]
+wheel_radius = 0.34
+wheel_rest_length = 0.3
+wheel_friction_slip = 2.5
+suspension_travel = 0.25
+suspension_stiffness = 20.0
+suspension_max_force = 30000.0
+damping_compression = 2.0
+damping_relaxation = 2.0
+
+[node name="Front_Left" parent="Car/VehicleBody3D" index="3"]
+wheel_radius = 0.34
+wheel_rest_length = 0.3
+wheel_friction_slip = 1.8
+suspension_travel = 0.25
+suspension_stiffness = 20.0
+damping_compression = 2.0
+damping_relaxation = 2.0
+
+[node name="Rear_Right" parent="Car/VehicleBody3D" index="4"]
+wheel_radius = 0.34
+wheel_rest_length = 0.3
+wheel_friction_slip = 1.8
+suspension_travel = 0.25
+suspension_stiffness = 20.0
+damping_compression = 2.0
+damping_relaxation = 2.0
+
+[node name="Front_Right" parent="Car/VehicleBody3D" index="5"]
+wheel_radius = 0.34
+wheel_rest_length = 0.3
+wheel_friction_slip = 1.8
+suspension_travel = 0.25
+suspension_stiffness = 20.0
+damping_compression = 2.0
+damping_relaxation = 2.0
+
 [connection signal="body_entered" from="StartTrigger" to="GameFlow" method="_on_start_trigger_entered"]
 [connection signal="body_entered" from="FinishTrigger" to="." method="_on_finish_trigger_entered"]
 
 [editable path="TrackRoot"]
-[editable path="Road/Terrain"]
-[editable path="WeatherController"]
+[editable path="TrackRoot/RoadBuilder"]
 [editable path="HUD"]
 [editable path="StartTrigger"]
 [editable path="FinishTrigger"]
+[editable path="Terrain"]
+[editable path="WeatherController"]
+[editable path="Car"]

@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://dhq82e8wnwhqs"]
+
+[ext_resource type="Script" uid="uid://crwwhmegsi3pq" path="res://scripts/Road Mesh + Collision Builder_Nicole/camera_3d.gd" id="1_dljj5"]
+[ext_resource type="PackedScene" uid="uid://cjvlghvjqi3xu" path="res://scenes/Test3DRoad.tscn" id="2_m6l08"]
+[ext_resource type="Script" uid="uid://qivrhn6wtx1e" path="res://scripts/Road Mesh + Collision Builder_Nicole/RoadBuilder.gd" id="3_7ay6p"]
+
+[sub_resource type="Curve3D" id="Curve3D_dddiq"]
+
+[node name="Main" type="Node3D"]
+
+[node name="Track" type="Path3D" parent="."]
+curve = SubResource("Curve3D_dddiq")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9848077, 0.17364818, 0, -0.17364818, 0.9848077, 0, 15, -30)
+current = true
+script = ExtResource("1_dljj5")
+
+[node name="Node3D" parent="." instance=ExtResource("2_m6l08")]
+
+[node name="Track" parent="Node3D" index="0"]
+visible = false
+
+[node name="CSGPolygon3D" parent="Node3D/Track" index="0"]
+visible = false
+
+[node name="Road" type="Node3D" parent="."]
+script = ExtResource("3_7ay6p")
+path = NodePath("../Node3D/Track")
+uv_repeat_meters = 2.0
+
+[editable path="Node3D"]

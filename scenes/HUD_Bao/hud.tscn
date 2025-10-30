@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://c7nhkkx242mer"]
 
-[ext_resource type="Script" uid="uid://btcmenc5wfvay" path="res://hud.gd" id="1_37p78"]
+[ext_resource type="Script" uid="uid://btcmenc5wfvay" path="res://scripts/HUD_Bao/hud.gd" id="1_37p78"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_37p78")
@@ -29,3 +29,30 @@ offset_bottom = 141.0
 
 [node name="MessageLabel" type="Label" parent="CenterContainer"]
 layout_mode = 2
+
+[node name="WeatherBar" type="HBoxContainer" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="ClearButton" type="Button" parent="WeatherBar"]
+layout_mode = 2
+focus_mode = 0
+text = "Clear"
+
+[node name="RainButton" type="Button" parent="WeatherBar"]
+layout_mode = 2
+focus_mode = 0
+text = "Rain"
+
+[node name="SnowButton" type="Button" parent="WeatherBar"]
+layout_mode = 2
+focus_mode = 0
+text = "Snow"

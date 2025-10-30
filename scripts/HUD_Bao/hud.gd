@@ -1,5 +1,13 @@
 extends CanvasLayer
 
+@export_node_path("Node3D") var weather_controller_path
+
+@onready var weather_controller: Node3D = get_node_or_null("/root/Main/WeatherController")
+
+@onready var clear_btn: Button = $WeatherBar/ClearButton
+@onready var rain_btn: Button = $WeatherBar/RainButton
+@onready var snow_btn: Button = $WeatherBar/SnowButton
+
 @onready var timer_label = $MarginContainer/VBoxContainer/Timer
 @onready var speed_label = $MarginContainer/VBoxContainer/Speed
 @onready var lap_label = $MarginContainer/VBoxContainer/Lap
@@ -27,7 +35,33 @@ func _ready():
 		update_speed(0.0)
 		update_lap(1, total_laps)
 		message_label.text = ""
-
+		
+	var root := get_tree().current_scene
+	if root:
+		weather_controller = root.find_child("WeatherController", true, false)
+	print("HUD ready. Found WeatherController =", weather_controller)
+	
+	if clear_btn: clear_btn.pressed.connect(_on_clear_pressed)
+	if rain_btn: rain_btn.pressed.connect(_on_rain_pressed)
+	if snow_btn: snow_btn.pressed.connect(_on_snow_pressed)
+	
+	print("HUD -> WeatherController:", weather_controller)
+	
+func _on_clear_pressed() -> void:
+	if weather_controller and weather_controller.has_method("set_weather"):
+		weather_controller.set_weather("clear")
+		print("Weather -> Clear")
+		
+func _on_rain_pressed() -> void:
+	if weather_controller and weather_controller.has_method("set_weather"):
+		weather_controller.set_weather("rain")
+		print("Weather -> Rain")
+		
+func _on_snow_pressed() -> void:
+	if weather_controller and weather_controller.has_method("set_weather"):
+		weather_controller.set_weather("snow")
+		print("Weather -> Snow")
+	
 func _process(delta):
 	if is_racing:
 		race_time += delta

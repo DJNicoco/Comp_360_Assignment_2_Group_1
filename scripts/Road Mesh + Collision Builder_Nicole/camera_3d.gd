@@ -44,6 +44,7 @@ func _setup_top_down() -> void:
 		size = radius + top_margin
 
 func _curve_bounds_xz(curve: Curve3D) -> Array:
+	@warning_ignore("shadowed_global_identifier")
 	var len : float = max(curve.get_baked_length(), 0.1)
 	var step := 1.0                               # 1m sampling is fine
 	var minx := INF; var maxx := -INF
