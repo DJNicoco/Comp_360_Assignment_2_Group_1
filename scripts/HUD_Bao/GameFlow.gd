@@ -28,7 +28,13 @@ func _ready():
 		start_trigger = get_node(start_trigger_path)
 	if finish_trigger_path:
 		finish_trigger = get_node(finish_trigger_path)
-		
+	
+	if start_trigger:
+		start_trigger.body_entered.connect(_on_start_trigger_entered)
+	if finish_trigger:
+		finish_trigger.body_entered.connect(_on_finish_trigger_entered)
+	
+
 	# Find HUD - try multiple paths
 	hud = get_node_or_null("../HUD")
 	if not hud:
@@ -105,13 +111,15 @@ func _on_finish_trigger_entered(body):
 		print("Lap ", current_lap, " / ", total_laps)
 
 func get_vehicle_speed() -> float:
-	# Get vehicle's linear velocity magnitude
-	if vehicle and vehicle.has_method("get_linear_velocity"):
-		return vehicle.get_linear_velocity().length()
-	elif vehicle:
-		# Fallback: calculate from position change
+	if not vehicle:
 		return 0.0
-	return 0.0
+	
+	if vehicle is RigidBody3D:
+		return (vehicle as RigidBody3D).linear_velocity.length()
+	elif vehicle is CharacterBody3D:
+		return (vehicle as CharacterBody3D).velocity.length()
+	else:
+		return 0.0
 
 func disable_vehicle_controls(disabled: bool):
 	# Disable/enable vehicle input during countdown

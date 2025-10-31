@@ -97,9 +97,9 @@ func update_timer(time: float):
 	if not timer_label:
 		return
 	@warning_ignore("integer_division")
-	var minutes = int(time) / 60
-	var seconds = fmod(time, 60.0)
-	timer_label.text = "Time: %02d:%05.2f" % [minutes, seconds]
+	var ms := int(round((time - int(time)) * 1000.0))
+	timer_label.text = "Time: %02d:%02d.%03d" % [int(time) / 60, int(time) % 60, ms]
+
 
 func update_speed(speed_mps: float):
 	if not speed_label:
