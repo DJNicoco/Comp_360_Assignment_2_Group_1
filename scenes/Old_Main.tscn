@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://8cekn4ao3gts"]
+
+[ext_resource type="Script" uid="uid://x7bhk6e3g7qg" path="res://scripts/HUD_Bao/GameFlow.gd" id="1_q8u5g"]
+[ext_resource type="PackedScene" uid="uid://ie8nnwkj3jqf" path="res://scenes/MainWorld.tscn" id="2_rvslj"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_q8u5g")
+start_trigger_path = NodePath("World/StartTrigger")
+finish_trigger_path = NodePath("World/FinishTrigger")
+
+[node name="World" parent="." instance=ExtResource("2_rvslj")]
+
+[editable path="World"]
+[editable path="World/Ramps"]
+[editable path="World/HUD"]
+[editable path="World/StartTrigger"]
+[editable path="World/FinishTrigger"]
+[editable path="World/WeatherController"]
+[editable path="World/Terrain"]

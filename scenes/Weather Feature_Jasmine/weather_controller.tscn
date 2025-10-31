@@ -85,8 +85,7 @@ script = ExtResource("1_drqsj")
 
 [node name="Rain" type="GPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 0)
-visible = false
-amount = 12000
+amount = 30000
 lifetime = 1.2
 preprocess = 0.51
 randomness = 0.77

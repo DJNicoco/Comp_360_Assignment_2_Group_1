@@ -9,7 +9,7 @@ func _physics_process(delta):
 	steering = lerp(steering, steer_input * 0.4, 5 * delta)
 
 	# Acceleration (W/S)
-	var acceleration = Input.get_axis("back", "forward")
+	var acceleration = Input.get_axis("down", "up")
 
 	var rpm = $back_left_wheel.get_rpm()
 	$back_left_wheel.engine_force = acceleration * max_torque * (1 - rpm / max_rpm)
