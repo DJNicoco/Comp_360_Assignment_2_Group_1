@@ -1,5 +1,3 @@
-# COMP 360 – Assignment 2  
-
 **Project:** Interactive Driving Simulation  
 **Course:** COMP 360 ON1 | Fall 2025  
 **Due Date:** Oct 30, 2025  
@@ -17,7 +15,7 @@ Players can **drive a vehicle or follow with a smooth camera**, navigate the tra
 - Start/Finish triggers that control laps and timing, and
 - A responsive HUD that displays the timer, speed, and lap progress.
 
-All features are integrated into one main scene (Main.tscn), where the terrain, track, road mesh/collision, weather, camera, and UI work together to simulate a complete driving experience.
+All features are integrated into MainWorld.tscn, which serves as the final root scene, replacing the old Main.tscn.
 
 ---
 
@@ -25,44 +23,61 @@ All features are integrated into one main scene (Main.tscn), where the terrain, 
 
 | **Member** | **Main Responsibility** | **Files / Scenes Worked On** |
 |-------------|------------------------|------------------------------|
-| Bilal  | Track Curve / Spline Generator | `3DRoad.tscn` |
-| Nicole | Road Mesh & Collision Builder | `RoadBuilder.gd`, `Road.tscn`, `Main.tscn`, `camera_3d.gd`, `textures` |
-| Unnati | Vehicle / Camera Controls + Easing of Movement | `CameraCar.gd`, `CarController.gd`|
+| Bilal  | Track Curve / Spline Generator | `Test3DRoad.tscn`, `Test3DRoad_2.tscn`  |
+| Nicole | Road Mesh & Collision Builder | `TestRoadBuilder.tscn`, `TestRoadBuilder.gd`, `test_camera_3d.gd`,  `weather_tile.tscn`, `MainWorld.tscn`, scene linking, version cleanup |
+| Unnati | Vehicle / Camera Controls + Easing of Movement | `TestCameraCar.gd`|
 | Easton | Terrain Integration | `3dLandscape.tscn` |
-| Bao | UI & Game Flow Logic | `HUD.tscn`, `HUD.gd`, `GameFlow.gd`, `StartTrigger.tscn`, `FinishTrigger.tscn` |
-| Michael | AI Car & Ramps Feauture | `AICar.gd`, `AICar.tscn`, `Ramp.gd`, `Ramp.tscn` |
-| Jasmine | Weather  | `WeatherController.gd`, `WeatherController.tscn` |
+| Bao | UI & Game Flow Logic | `hud.tscn`, `hud.gd`, `GameFlow.gd`, `StartTrigger.tscn`, `FinishTrigger.tscn` |
+| Michael | AI Car & Ramps Feauture | `old_car.gd`, `Ramp.tscn`, `NewCarScript.gd`, `TestVehicleCamera.gd`, `test_vehicle_body_3d.gd` |
+| Jasmine | Weather  | `weather_controller.gd`, `weather_controller.tscn` |
 
 ---
 
 ## Team Workflow
 
-Each member worked in their own godot software and sent the scripts and scenes to Nicole (Road Mesh & Collision Builder). She maintained the main repository and integrated all individual .tscn scenes and .gd scripts into the main project.
-This ensured consistent folder structure and correct scene linking inside Main.tscn.
+Each member worked independently in Godot and shared their scenes and scripts with Nicole, who maintained the main repository.
+She integrated all .tscn and .gd files into the final project, ensuring a consistent folder structure and correct scene linking inside MainWorld.tscn.
+
+---
+
+### Project Refactor & Version Control Cleanup
+
+During final integration, duplicate and legacy scenes (Main.tscn, TestWorld.tscn, old road and car files) were removed.
+All systems — car, road, ramps, weather, HUD, AI, and triggers — were consolidated under MainWorld.tscn for clarity and stability.
+A nested Git repository was also removed to prevent version control conflicts, ensuring a single clean repo for grading and future development.
 
 ---
 
 ## Core Features 
 
-**Procedural Road System:** <br>
-Built using RoadBuilder.gd and a spline (Track Path3D) to generate a smooth, collision-ready mesh.
+### Procedural Road System: <br>
+Built using `RoadBuilder.gd` and a spline (`Track Path3D`) to generate a smooth, collision-ready mesh.
 
-**Dynamic Terrain Integration:** <br>
-Terrain imported and positioned beneath the road; adjustable elevation for visual realism.
+### Dynamic Terrain Integration: <br>
+Terrain positioned beneath the track with adjustable elevation for visual realism.
 
-**Camera System:** <br>
-Third-person chase camera (camera_3d.gd) with smooth follow and look-ahead functionality.
+### Camera System: <br>
+Third-person chase camera providing smooth follow and look-ahead movement.
 
-**HUD & Game Flow:** <br>
-On-screen interface (HUD.tscn + hud.gd) displays time, speed, and laps.
-Race logic handled by GameFlow.gd — includes countdown, lap tracking, and finish detection.
+### HUD & Game Flow: <br>
+Displays time, speed, and laps; race logic handles countdown, lap tracking, and finish detection.
 
-**Weather Effects:** <br>
-Managed by WeatherController.gd, featuring toggleable rain and snow particle systems.
+### Dynamic Weather System (Updated) <br>
+Managed by `WeatherController.gd`, featuring rain and snow that follow the player and align with the road surface.
 
-**AI Car & Ramps:** <br>
-Implemented through AICar.gd and Ramp.gd — adds an AI-controlled vehicle and ramps for interaction.
+### AI Car & Ramps: <br>
+Adds an AI-controlled vehicle and interactive ramps for dynamic driving behavior.
 
-**Start / Finish Triggers:** <br>
-StartTrigger.tscn and FinishTrigger.tscn detect lap progression and control race state transitions.
+### Start / Finish Triggers: <br>
+Detect lap progression and control race start, lap count, and finish timing.
+
+---
+
+## Limitations & Future Improvements
+
+- **Weather System:** The tile-based weather coverage (`weather_tile.tscn`) and dynamic follow logic were only partially implemented. Rain and snow remained static near the track center instead of following the player, and full-track coverage still requires optimization for performance.
+- **Car:** The vehicle moves and interacts with ramps, but pathfinding and overtaking behaviors need refinement for smoother racing.  
+- **Camera Tuning:** The third-person camera occasionally clips through ramps or terrain at high speeds and could benefit from collision-based repositioning.  
+- **HUD Timer:** The HUD does not automatically start when the car begins moving; the race timer must be triggered manually. <br>
+- **Physics Balancing:** Suspension and traction parameters need further tuning to prevent sliding during sharp turns.  
 
