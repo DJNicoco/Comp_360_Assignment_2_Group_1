@@ -14,12 +14,6 @@ extends Node3D
 @export var margin: float = 10.0               
 var _cam: Camera3D = null
 
-@export var path_to_track: NodePath
-@export var tile_scene: PackedScene
-@export var spacing_m: float = 80.0
-@export var tile_y_offset: float = 40.0
-@export var build_tiles_on_start: bool = false
-
 var _tiles_parent: Node3D
 var current_weather := "clear"
 
@@ -37,9 +31,6 @@ func _ready() -> void:
 		_apply_weather("rain")
 	else:
 		_apply_weather("clear")
-
-	if build_tiles_on_start:
-		build_track_emitters()
 
 	_resize_emitters_to_view()
 
@@ -70,8 +61,6 @@ func _apply_weather(state: String) -> void:
 		else:
 			snow.emitting = false
 			snow.visible = false
-
-	_apply_material_to_tiles()
 
 func _physics_process(_dt: float) -> void:
 	if _cam == null:
@@ -128,52 +117,3 @@ func _resize_emitters_to_view() -> void:
 		t.origin = Vector3(global_transform.origin.x, _cam.global_transform.origin.y, global_transform.origin.z)
 		t = t.translated_local(Vector3(0, 0, -depth * 0.5))
 		p.global_transform = t
-
-func build_track_emitters() -> void:
-	var p: Path3D = get_node_or_null(path_to_track)
-	if p == null or tile_scene == null:
-		push_warning("Assign path_to_track and tile_scene on WeatherController.")
-		return
-
-	if _tiles_parent and is_instance_valid(_tiles_parent):
-		_tiles_parent.queue_free()
-
-	_tiles_parent = Node3D.new()
-	_tiles_parent.name = "WeatherTiles"
-	add_child(_tiles_parent)
-
-	var c := p.curve
-	var L := c.get_baked_length()
-	var d: float = 0.0
-	while d <= L:
-		var local_pos: Vector3 = c.sample_baked(d)
-		var world_pos: Vector3 = p.to_global(local_pos)
-
-		var tile := tile_scene.instantiate()
-		tile.name = "WeatherTile_%03d" % int(d)
-		_tiles_parent.add_child(tile)
-		tile.global_position = world_pos + Vector3.UP * tile_y_offset
-
-		d += spacing_m
-
-	_apply_material_to_tiles()
-	print("Built weather tiles:", _tiles_parent.get_child_count())
-
-func _apply_material_to_tiles() -> void:
-	if _tiles_parent == null:
-		return
-
-	var mat: ParticleProcessMaterial = null
-	if current_weather == "rain" and rain:
-		mat = (rain.process_material as ParticleProcessMaterial).duplicate(true)
-	elif current_weather == "snow" and snow:
-		mat = (snow.process_material as ParticleProcessMaterial).duplicate(true)
-
-	for tile in _tiles_parent.get_children():
-		var gp := tile.get_node_or_null("Precip") as GPUParticles3D
-		if gp:
-			if mat:
-				gp.process_material = mat.duplicate(true)
-				gp.emitting = true
-			else:
-				gp.emitting = false
